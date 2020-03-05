@@ -17,46 +17,59 @@ namespace MatsvinnApp
         {
             string[] days =
             {
-                "Måndag",
-                "Tisdag",
-                "Onsdag",
-                "Torsdag",
-                "Fredag",
-                "Lördag",
-                "Söndag"
+                "Mån",
+                "Tis",
+                "Ons",
+                "Tor",
+                "Fre",
+                "Lör",
+                "Sön"
             };
 
-        
+            string[] months =
+            {
+                "Januari",
+                "Februari",
+                "Mars",
+                "April",
+                "Maj",
+                "Juni",
+                "Juli",
+                "Augusti",
+                "September",
+                "Oktober",
+                "November",
+                "December"
+            };
 
-            DateTime moment = DateTime.Now;
-            CultureInfo myCI = new CultureInfo("en-US");
+            int TranslateDayOfWeek(int index)
+            {
+                if(index == 0)
+                {
+                    return 6;
+                }
+                else
+                {
+                    index--;
+                    return index;
+                }
+            }       
+
+            DateTime moment = DateTime.Now.AddMonths(1);
+            CultureInfo myCI = new CultureInfo("sv-SE");
+
             Calendar myCal = myCI.Calendar;
 
             CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
             DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
 
-            int month = moment.Month;
+            int month = moment.Month - 1;
             int year = moment.Year;
 
-            int WeekOfMonth(DateTime date)
-            {
-                date = date.Date;
-                DateTime firstMonthDay = new DateTime(date.Year, date.Month, 1);
-                DateTime firstMonthMonday = firstMonthDay.AddDays((DayOfWeek.Monday + 7 - firstMonthDay.DayOfWeek) % 7);
-                if (firstMonthMonday > date)
-                {
-                    firstMonthDay = firstMonthDay.AddMonths(-1);
-                    firstMonthMonday = firstMonthDay.AddDays((DayOfWeek.Monday + 7 - firstMonthDay.DayOfWeek) % 7);
-                }
-                int week = (date - firstMonthMonday).Days / 7 + 1;
-
-                return week;
-
-            }
 
             InitializeComponent();
 
-            Title = "March";
+            Title = "Kalender";
 
             ToolbarItem item = new ToolbarItem
             {
@@ -66,51 +79,122 @@ namespace MatsvinnApp
             };
             this.ToolbarItems.Add(item);
 
-            int daysInMonth = DateTime.DaysInMonth(year, month);
+            Grid dayGrid = new Grid()
+            {
+                Padding = new Thickness(30, 0)
+            };
 
-            Grid dayGrid = new Grid();
             for (int i = 0; i < 7; i++)
             {
                 dayGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 Label label = new Label()
                 {
+                    HeightRequest = 200,
+                    WidthRequest = 50,
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center,
                     Text = days[i]
                 };
                 dayGrid.Children.Add(label, i, 0);
             }
 
-            Grid calenderGrid = new Grid();
 
-            for (int i = 0; i < 7; i++)
+            StackLayout monthLayout = new StackLayout()
             {
-                calenderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            }
+                Spacing = 0,
+            };
 
-            for (int i = 0; i < 6; i++)
+            for (int j = 0; j < 12; j++)
             {
-                calenderGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
-            }
+                int currMonth = j + 1;
 
-            for (int i = 0; i < daysInMonth; i++)
-            {
-                DateTime date = new DateTime(year, month, 1).AddDays(i);
-
-                Button button = new Button
+                Label lbl = new Label
                 {
-                    Text = date.Day.ToString(),
-                    HorizontalOptions = LayoutOptions.Center,
-                    VerticalOptions = LayoutOptions.Center
+                    WidthRequest = 100,
+                    HeightRequest = 100,
+                    Text = months[j],
+                    HorizontalTextAlignment = TextAlignment.Center,
+                    VerticalTextAlignment = TextAlignment.Center
                 };
-                int week = myCal.GetWeekOfYear(date, myCWR, myFirstDOW);
-                calenderGrid.Children.Add(button, (int)myCal.GetDayOfWeek(date), WeekOfMonth(date));
-                date.AddDays(i);
+
+                Grid calenderGrid = new Grid()
+                {
+                    Margin = 30,
+                    Padding = 5
+
+                };  
+
+                for (int i = 0; i < 7; i++)
+                {
+                    calenderGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                }
+
+                for (int i = 0; i < 6; i++)
+                {
+                    calenderGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+                }
+
+                int daysInMonth = DateTime.DaysInMonth(year, currMonth);
+                int weekOfMonth = 0;
+                for (int i = 0; i < daysInMonth; i++)
+                {
+                   
+
+                    DateTime date = new DateTime(year, currMonth, 1).AddDays(i);
+
+
+                    if (date.DayOfWeek == DayOfWeek.Monday)
+                    {
+                        weekOfMonth++;
+                    }
+
+                    Button button = new Button
+                    {
+                        Text = date.Day.ToString(),
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        HeightRequest = 60,
+                        WidthRequest = 100,
+                        BackgroundColor = Color.Gray
+
+                    };
+
+                    if (date.Month == month)
+                    {
+                        if (date.Day == DateTime.Now.Day)
+                        {
+                            button.BackgroundColor = Color.LightGreen;
+                        }
+                        else
+                        {
+                            button.BackgroundColor = Color.LightGray;
+                        }
+
+                    }
+                    int dOFweek = TranslateDayOfWeek((int)myCal.GetDayOfWeek(date));
+
+                    calenderGrid.Children.Add(button, dOFweek, weekOfMonth);
+                }
+                monthLayout.Children.Add(lbl);
+                monthLayout.Children.Add(calenderGrid);
             }
-            StackLayout stackLayout = new StackLayout();
-            stackLayout.Children.Add(dayGrid);
-            stackLayout.Children.Add(calenderGrid);
+
+            ScrollView scrollView = new ScrollView();
+            scrollView.Content = monthLayout;
 
 
-            Content = stackLayout;
+            Grid ParentGrid = new Grid
+            {
+                RowSpacing = 10
+            };
+            ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.2, GridUnitType.Star) });
+            ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
+            ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+        
+            ParentGrid.Children.Add(dayGrid, 0, 0);
+            ParentGrid.Children.Add(scrollView, 0, 1);
+         
+            Content = ParentGrid;
         }
       
     }

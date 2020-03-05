@@ -15,11 +15,11 @@
             </Grid.RowDefinitions>
             
             <StackLayout Margin="10, 90,10,0" >
-                <Entry Placeholder="Email"/>
-                <Entry IsPassword="True" Placeholder="Password"/>
+                <Entry x:Name="email"  Placeholder="Email"/>
+                <Entry x:Name="password" IsPassword="True" Placeholder="Password"/>
                 
                 <StackLayout Orientation="Horizontal" Spacing="0">
-                    <CheckBox/>
+                    <CheckBox x:Name="rememberBox"/>
                     <Label Text="Remember me" VerticalOptions="Center" HorizontalOptions="Start"/>
                 </StackLayout>
                 

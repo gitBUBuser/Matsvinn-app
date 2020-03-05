@@ -16,7 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="CustomRenderers\IOS\" />
+    <Folder Include="CustomRenderers\Android\" />
+    <Folder Include="CustomRenderers\UWP\" />
     <Folder Include="Models\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Xamarin.Forms.Platform.UAP">
+      <HintPath>..\..\..\..\..\..\..\..\Microsoft\Xamarin\NuGet\xamarin.forms\4.3.0.908675\lib\uap10.0\Xamarin.Forms.Platform.UAP.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
