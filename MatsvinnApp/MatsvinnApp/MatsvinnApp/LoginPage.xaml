@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MatsvinnApp.LoginPage">
+
+    <ContentPage.Content>
+        <Grid BackgroundColor="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <StackLayout Margin="10, 90,10,0" >
+                <Entry Placeholder="Email"/>
+                <Entry IsPassword="True" Placeholder="Password"/>
+                
+                <StackLayout Orientation="Horizontal" Spacing="0">
+                    <CheckBox/>
+                    <Label Text="Remember me" VerticalOptions="Center" HorizontalOptions="Start"/>
+                </StackLayout>
+                
+                <Button Text="Login" Clicked="LoginButtonClicked" HeightRequest="100"/>
+            </StackLayout>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
