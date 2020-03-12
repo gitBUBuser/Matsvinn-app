@@ -5,17 +5,23 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Globalization;
 using System.Diagnostics;
+using MatsvinnApp.Models;
+using MatsvinnApp.FileManagement;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Collections.ObjectModel;
 
 namespace MatsvinnApp
 {
     public partial class StudentCalenderPage : ContentPage
     {
-        public StudentCalenderPage()
-        {
-            string[] days =
+        FileManager fileManager;
+        ListView dateInfo;
+        ObservableCollection<Food> foods;
+        Label dateLabel;
+
+        string[] days =
             {
                 "Mån",
                 "Tis",
@@ -26,8 +32,8 @@ namespace MatsvinnApp
                 "Sön"
             };
 
-            string[] months =
-            {
+        string[] months =
+        {
                 "Januari",
                 "Februari",
                 "Mars",
@@ -42,6 +48,79 @@ namespace MatsvinnApp
                 "December"
             };
 
+        public StudentCalenderPage()
+        {
+
+            foods = new ObservableCollection<Food>();
+
+            dateLabel = new Label()
+            {
+                HorizontalTextAlignment = TextAlignment.Center,
+                FontSize = 20,
+                TextColor = Color.DarkGray
+                
+            };
+
+            dateInfo = new ListView()
+            {
+                HorizontalOptions = LayoutOptions.CenterAndExpand,
+                SeparatorColor = Color.LightGray,
+                ItemTemplate = new DataTemplate(() =>
+                {                      
+                    Label foodNameLabel = new Label();
+                    foodNameLabel.SetBinding(Label.TextProperty, "Name");
+
+                    Label captionLabel = new Label()
+                    {
+                        TextColor = Color.DimGray
+                    };
+                    captionLabel.SetBinding(Label.TextProperty, "Caption");
+
+                    BoxView boxView = new BoxView()
+                    {
+                      
+                    };
+
+                    return new ViewCell
+                    {
+                        View = new StackLayout
+                        {
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            Spacing = 0,
+                            Children =
+                                    {
+                                        foodNameLabel,
+                                        captionLabel
+                                    }
+                        }
+
+                    };
+                })
+            };
+
+            StackLayout bottomLayout = new StackLayout()
+            {
+                Margin = new Thickness(30,30,30,0),
+                Spacing = 20,
+                Children =
+                {
+                    dateLabel,
+                    dateInfo
+                }
+            };
+
+            dateInfo.ItemSelected += (object sender, SelectedItemChangedEventArgs e) =>
+            {
+                var tapped = e.SelectedItem;
+                Navigation.PushAsync(new FoodInfo((Food)tapped) );
+            };
+
+            dateInfo.ItemsSource = foods;
+            fileManager = new FileManager();
+            
+
+
             int TranslateDayOfWeek(int index)
             {
                 if(index == 0)
@@ -53,9 +132,9 @@ namespace MatsvinnApp
                     index--;
                     return index;
                 }
-            }       
-
-            DateTime moment = DateTime.Now.AddMonths(1);
+            }
+            DateTime moment = DateTime.Now;
+            DateTime selected = moment;
             CultureInfo myCI = new CultureInfo("sv-SE");
 
             Calendar myCal = myCI.Calendar;
@@ -63,7 +142,6 @@ namespace MatsvinnApp
             CalendarWeekRule myCWR = myCI.DateTimeFormat.CalendarWeekRule;
             DayOfWeek myFirstDOW = myCI.DateTimeFormat.FirstDayOfWeek;
 
-            int month = moment.Month - 1;
             int year = moment.Year;
 
 
@@ -106,12 +184,12 @@ namespace MatsvinnApp
 
             for (int j = 0; j < 12; j++)
             {
-                int currMonth = j + 1;
+                int currMonth = j;
 
                 Label lbl = new Label
                 {
-                    WidthRequest = 100,
-                    HeightRequest = 100,
+                    FontSize = 25,
+                    TextColor = Color.Gray,
                     Text = months[j],
                     HorizontalTextAlignment = TextAlignment.Center,
                     VerticalTextAlignment = TextAlignment.Center
@@ -134,13 +212,13 @@ namespace MatsvinnApp
                     calenderGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
                 }
 
-                int daysInMonth = DateTime.DaysInMonth(year, currMonth);
+                int daysInMonth = DateTime.DaysInMonth(year, currMonth + 1);
                 int weekOfMonth = 0;
                 for (int i = 0; i < daysInMonth; i++)
                 {
                    
 
-                    DateTime date = new DateTime(year, currMonth, 1).AddDays(i);
+                    DateTime date = new DateTime(year, currMonth + 1, 1).AddDays(i);
 
 
                     if (date.DayOfWeek == DayOfWeek.Monday)
@@ -156,10 +234,12 @@ namespace MatsvinnApp
                         HeightRequest = 60,
                         WidthRequest = 100,
                         BackgroundColor = Color.Gray
-
+                        
                     };
+                    button.Clicked += delegate { DateSelected(date); };
 
-                    if (date.Month == month)
+
+                    if (date.Month == moment.Month)
                     {
                         if (date.Day == DateTime.Now.Day)
                         {
@@ -187,15 +267,33 @@ namespace MatsvinnApp
             {
                 RowSpacing = 10
             };
+
+            DateSelected(selected);
+
+            
+
             ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.2, GridUnitType.Star) });
             ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
-            ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1.5, GridUnitType.Star) });
         
             ParentGrid.Children.Add(dayGrid, 0, 0);
             ParentGrid.Children.Add(scrollView, 0, 1);
-         
+            ParentGrid.Children.Add(bottomLayout, 0, 2);
+
             Content = ParentGrid;
         }
-      
+
+        void DateSelected(DateTime selected)
+        {
+            List<Food> foodItems = fileManager.FoodsAtDate(selected);
+            
+            if (foodItems.Count() == 0)
+            {
+                foodItems.Add(new Food(" ", "otillgänglig", "Inte tillgänglig. Kom tillbaka"));
+            }
+            dateLabel.Text = selected.Year + " / " + months[selected.Month - 1] + " / " + selected.Day;
+            foods = new ObservableCollection<Food>(foodItems);
+            dateInfo.ItemsSource = foods;
+        }
     }
 }

@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MatsvinnApp.FoodInfo"
+             Title="Food">
+    
+    <ContentPage.Content>
+        
+        <StackLayout Padding="20">
+            <Label Text="date"
+                   x:Name="date"
+                HorizontalOptions="CenterAndExpand" />
+            
+            <ScrollView VerticalOptions="CenterAndExpand">
+                <Label
+                x:Name="FoodInf"
+                Text="This is a placeholder. This placeholder is put here to try how well the text works"/>
+            </ScrollView>
+            
+            <Label 
+                Text="Tänker du äta vid detta datum?"
+                FontSize="Title"
+                HorizontalOptions="CenterAndExpand"/>
+            
+            <StackLayout 
+                Orientation="Horizontal"
+                         Spacing="20">
+                <Button Text="JA!" 
+                        HeightRequest="100" 
+                        WidthRequest="150"
+                        HorizontalOptions="CenterAndExpand"/>
+                <Button Text="Nej!" 
+                        HeightRequest="100" 
+                        WidthRequest="150"
+                        HorizontalOptions="CenterAndExpand"/>
+
+            </StackLayout>
+            
+
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

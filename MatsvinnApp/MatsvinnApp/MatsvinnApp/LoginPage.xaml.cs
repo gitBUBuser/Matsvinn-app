@@ -11,6 +11,7 @@ namespace MatsvinnApp
 {
     public partial class LoginPage : ContentPage
     {
+        string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         public LoginPage()
         {
             InitializeComponent();
@@ -25,7 +26,6 @@ namespace MatsvinnApp
                 rememberBox.IsChecked = true;
             }
         }
-        string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
         async void LoginButtonClicked(object sender, EventArgs args)
         {
@@ -47,6 +47,10 @@ namespace MatsvinnApp
                         await Navigation.PushAsync(new StudentMainPage { });
                     }
                 }
+            }
+            else
+            {
+                File.WriteAllText(loginData, mail + '|' + pass);
             }
 
             string saveData = Path.Combine(saveFolder, "LatestUser.txt");

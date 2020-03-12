@@ -10,7 +10,7 @@ namespace MatsvinnApp
         {
             InitializeComponent();
 
-            MainPage = new NavigationPage(new StartPage());
+            MainPage = new NavigationPage(new LoginPage());
         }
 
         protected override void OnStart()
