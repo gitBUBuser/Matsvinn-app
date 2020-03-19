@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Globalization;
-using System.Diagnostics;
 using MatsvinnApp.Models;
 using MatsvinnApp.FileManagement;
 
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace MatsvinnApp
 {
-    public partial class StudentCalenderPage : ContentPage
+   
+    public partial class AdminCalenderPage : ContentPage
     {
         FileManager fileManager;
         ListView dateInfo;
@@ -48,9 +48,9 @@ namespace MatsvinnApp
                 "December"
             };
 
-        public StudentCalenderPage()
+        public AdminCalenderPage()
         {
-
+            DateTime dateSave = new DateTime();
             foods = new ObservableCollection<Food>();
 
             dateLabel = new Label()
@@ -58,7 +58,7 @@ namespace MatsvinnApp
                 HorizontalTextAlignment = TextAlignment.Center,
                 FontSize = 20,
                 TextColor = Color.DarkGray
-                
+
             };
 
             dateInfo = new ListView()
@@ -66,7 +66,7 @@ namespace MatsvinnApp
                 HorizontalOptions = LayoutOptions.CenterAndExpand,
                 SeparatorColor = Color.LightGray,
                 ItemTemplate = new DataTemplate(() =>
-                {                      
+                {
                     Label foodNameLabel = new Label();
                     foodNameLabel.SetBinding(Label.TextProperty, "Name");
 
@@ -78,7 +78,7 @@ namespace MatsvinnApp
 
                     BoxView boxView = new BoxView()
                     {
-                      
+
                     };
 
                     return new ViewCell
@@ -99,13 +99,24 @@ namespace MatsvinnApp
                 })
             };
 
+            Button addButton = new Button()
+            {
+                Text = "+",
+                HeightRequest = 30,
+                WidthRequest = 30
+            };
+            addButton.Clicked += delegate { AddFood(dateSave); };
+
+
+
             StackLayout bottomLayout = new StackLayout()
             {
-                Margin = new Thickness(30,30,30,0),
+                Margin = new Thickness(30, 30, 30, 0),
                 Spacing = 20,
                 Children =
                 {
                     dateLabel,
+                    addButton,
                     dateInfo
                 }
             };
@@ -113,17 +124,17 @@ namespace MatsvinnApp
             dateInfo.ItemSelected += (object sender, SelectedItemChangedEventArgs e) =>
             {
                 var tapped = e.SelectedItem;
-                Navigation.PushAsync(new FoodInfo((Food)tapped) );
+                Navigation.PushAsync(new FoodEditPage((Food)tapped));
             };
 
             dateInfo.ItemsSource = foods;
             fileManager = new FileManager();
-            
+
 
 
             int TranslateDayOfWeek(int index)
             {
-                if(index == 0)
+                if (index == 0)
                 {
                     return 6;
                 }
@@ -134,7 +145,6 @@ namespace MatsvinnApp
                 }
             }
             DateTime moment = DateTime.Now;
-            DateTime selected = moment;
             CultureInfo myCI = new CultureInfo("sv-SE");
 
             Calendar myCal = myCI.Calendar;
@@ -192,7 +202,7 @@ namespace MatsvinnApp
                     Margin = 30,
                     Padding = 5
 
-                };  
+                };
 
                 for (int i = 0; i < 7; i++)
                 {
@@ -208,7 +218,7 @@ namespace MatsvinnApp
                 int weekOfMonth = 0;
                 for (int i = 0; i < daysInMonth; i++)
                 {
-                   
+
 
                     DateTime date = new DateTime(year, currMonth + 1, 1).AddDays(i);
 
@@ -226,9 +236,9 @@ namespace MatsvinnApp
                         HeightRequest = 60,
                         WidthRequest = 100,
                         BackgroundColor = Color.Gray
-                        
+
                     };
-                    button.Clicked += delegate { DateSelected(date); };
+                    button.Clicked += delegate { DateSelected(date); dateSave = date; };
 
 
                     if (date.Month == moment.Month)
@@ -260,14 +270,12 @@ namespace MatsvinnApp
                 RowSpacing = 10
             };
 
-            DateSelected(selected);
-
-            
+            DateSelected(moment);
 
             ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(0.2, GridUnitType.Star) });
             ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
             ParentGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1.5, GridUnitType.Star) });
-        
+
             ParentGrid.Children.Add(dayGrid, 0, 0);
             ParentGrid.Children.Add(scrollView, 0, 1);
             ParentGrid.Children.Add(bottomLayout, 0, 2);
@@ -278,10 +286,16 @@ namespace MatsvinnApp
         void DateSelected(DateTime selected)
         {
             List<Food> foodItems = fileManager.FoodsAtDate(selected);
-          
             dateLabel.Text = selected.Year + " / " + months[selected.Month - 1] + " / " + selected.Day;
             foods = new ObservableCollection<Food>(foodItems);
             dateInfo.ItemsSource = foods;
         }
+
+        void AddFood(DateTime selected)
+        {
+            Food food = new Food(selected.Date, "", "");
+            Navigation.PushAsync(new FoodEditPage(food));
+        }
+
     }
 }

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="MatsvinnApp.AdminMainPage">
+    <ContentPage.Content>
+        <StackLayout VerticalOptions="CenterAndExpand" Margin="20,10,20,100">
+            <Button Text="Dagens mat" HeightRequest="70"
+                    Clicked="ButtonClickedFoodOfTheDay"/>
+            <Button Text="Kalender" HeightRequest="70"
+                    Clicked="ButtonClickedCalender"/>
+            <Button Text="Statistik" HeightRequest="70"
+                    Clicked="ButtonClickedCalender"/>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
