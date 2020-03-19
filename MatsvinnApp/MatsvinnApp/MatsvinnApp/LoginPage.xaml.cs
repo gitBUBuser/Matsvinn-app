@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.IO;
+using MatsvinnApp.Models;
+using MatsvinnApp.Services;
 
 namespace MatsvinnApp
 {
@@ -35,6 +37,7 @@ namespace MatsvinnApp
             string mail = email.Text;
             string pass = password.Text;
             bool remember = rememberBox.IsChecked;
+
             if (File.Exists(loginData))
             {
                 string[] lines = File.ReadAllLines(loginData);
@@ -44,7 +47,31 @@ namespace MatsvinnApp
                     string[] dat = lines[i].Split('|');
                     if (dat[0] == mail && dat[1] == pass)
                     {
-                        await Navigation.PushAsync(new StudentMainPage { });
+                       
+                        bool admin = bool.Parse(dat[2]);
+
+                        string[] dateStrings = dat[3].Split(',');
+                        List<DateTime> dates = new List<DateTime>();
+
+                        for (int j = 0; j < dateStrings.Length; j++)
+                        {
+                            DateTime date;
+                            if (DateTime.TryParse(dateStrings[j], out date)) 
+                            {
+                                dates.Add(date);
+                            }
+                        }
+                        UserInfo user = new UserInfo(mail, pass, admin, dates);
+                        GlobalVars.user = user;
+
+                        if (user.Admin)
+                        {
+                            await Navigation.PushAsync(new AdminMainPage { });
+                        }
+                        else
+                        {
+                            await Navigation.PushAsync(new StudentMainPage { });
+                        }
                     }
                 }
             }

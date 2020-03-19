@@ -19,8 +19,7 @@ namespace MatsvinnApp
             food = selectedFood;
             Title = food.Name;
             FoodInf.Text = food.Caption;
-            date.Text = food.Date;
-
+            date.Text = date.ToString();
         }
     }
 }
